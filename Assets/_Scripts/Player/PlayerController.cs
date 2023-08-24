@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour
     List<RaycastHit2D> _castCollisions = new List<RaycastHit2D>();
 
     Vector2 _movementInput;
-    SpriteRenderer _spriteRenderer;
     Rigidbody2D _rigidbody;
     Animator _animator;
 
@@ -22,7 +21,6 @@ public class PlayerController : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void FixedUpdate()
