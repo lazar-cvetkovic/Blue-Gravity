@@ -11,4 +11,12 @@ public class PlayerInteraction : MonoBehaviour
             interactableObject.Interact();
         }
     }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.TryGetComponent(out IInteractable interactableObject))
+        {
+            interactableObject.CloseInteraction();
+        }
+    }
 }

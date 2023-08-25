@@ -6,6 +6,7 @@ using UnityEngine;
 public class DialogueTrigger : MonoBehaviour, IInteractable
 {
     public static event Action<DialogueTrigger> OnInteract;
+    public static event Action OnCloseInteraction;
     public static event Action<DialogueSO, bool> OnDialogue;
 
     [SerializeField] DialogueSO _dialogueData;
@@ -14,4 +15,6 @@ public class DialogueTrigger : MonoBehaviour, IInteractable
     public void Interact() => OnInteract?.Invoke(this);
 
     public void StartDialogue() => OnDialogue?.Invoke(_dialogueData, _isShop);
+
+    public void CloseInteraction() => OnCloseInteraction?.Invoke();
 }

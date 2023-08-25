@@ -13,13 +13,13 @@ public class ButtonSettings : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     [SerializeField] ButtonType _buttonType;
     [SerializeField] int _sceneIndex;
+    [SerializeField] Button _button;
 
-    Button _button;
     RectTransform _rect;
 
     private void Awake()
     {
-        _button = GetComponent<Button>();
+        _button ??= GetComponent<Button>();
         _rect = _button.GetComponent<RectTransform>();
         _button.image.sprite = ButtonSprites.NormalSprite;
     }
@@ -39,6 +39,8 @@ public class ButtonSettings : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             case ButtonType.QUIT:
                 _button.onClick.AddListener(LevelManager.Instance.QuitGame);
                 break;
+            case ButtonType.OTHER:
+                break;
         }
     }
 
@@ -49,6 +51,9 @@ public class ButtonSettings : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         ChangeButtonImage(ButtonSprites.PressedSprite, true);
         PlaySound(SoundType.BUTTON_CLICK_1);
         StartCoroutine(ChangeToNormalSprite());
+
+        if(_buttonType == ButtonType.OTHER) 
+            _button.onClick?.Invoke();
     }
 
     private IEnumerator ChangeToNormalSprite()
@@ -62,7 +67,6 @@ public class ButtonSettings : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (yPointerPosition == _rect.localPosition.y)
         {
             HandleButtonPressing();
-            _button.onClick.Invoke();
         }
     }
 

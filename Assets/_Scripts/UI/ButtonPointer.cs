@@ -3,31 +3,58 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class ButtonPointer : MonoBehaviour
 {
     public static Action<float> ClickedEnter;
 
+    PlayerInputActions _playerInput;
     ButtonSettings[] _buttons;
     Dictionary<int, float> _buttonYPositions = new();
+    Vector2 _movementInput;
+    WaitForSeconds _waitForSeconds;
 
     int _selectedButtonIndex;
     bool _arrowInputHandled = true;
 
-    private void Awake() => _buttons = transform.parent.GetComponentsInChildren<ButtonSettings>();
+    private void Awake()
+    {
+        _buttons = transform.parent.GetComponentsInChildren<ButtonSettings>();
+        _waitForSeconds = new WaitForSeconds(0.2f);
+        _playerInput = new();
+    }
 
     private void Start()
     {
         StartCoroutine(AddButtonPositionsCoroutine());
+        _playerInput.Player.Enter.performed += HandleEnterInput;
         ButtonSettings.PointerChanged += ChangePointerPosition;
         OptionsMenu.OptionsMenuClosed += ResetPointer;
     }
 
+
     private void OnDestroy()
     {
+        _playerInput.Player.Enter.performed -= HandleEnterInput;
         ButtonSettings.PointerChanged -= ChangePointerPosition;
         OptionsMenu.OptionsMenuClosed -= ResetPointer;
+    }
+
+    private void OnEnable()
+    {
+        _playerInput.Enable();
+    }
+
+    private void OnDisable()
+    {
+        _playerInput.Disable();
+    }
+
+    private void Update()
+    {
+        HandleArrowInputs();
     }
 
     private IEnumerator AddButtonPositionsCoroutine()
@@ -62,31 +89,22 @@ public class ButtonPointer : MonoBehaviour
 
     private void ResetPointer() => ChangePointerPosition(_buttonYPositions[0]);
 
-    private void Update()
+    private void HandleEnterInput(InputAction.CallbackContext context)
     {
-        HandleEnterInput();
-        HandleArrowInputs();
-    }
-
-    private void HandleEnterInput()
-    {
-        if(Input.GetKeyDown(KeyCode.Return))
-            ClickedEnter?.Invoke(GetComponent<RectTransform>().localPosition.y);
+        ClickedEnter?.Invoke(GetComponent<RectTransform>().localPosition.y);
     }
 
     private void HandleArrowInputs()
     {
-        float verticalInput = Input.GetAxisRaw("Vertical");
+        if(_movementInput.y == 0) return;
 
-        if (Mathf.Abs(verticalInput) <= 0.1f)
-        {
-            _arrowInputHandled = true;
-            return;
-        }
+        float verticalInput = _movementInput.y;
 
         if (_arrowInputHandled)
         {
             _arrowInputHandled = false;
+            StartCoroutine(InputTimer());
+
             AudioManager.Instance.PlaySFX(SoundType.BUTTON_HOVER);
 
             int direction = (int)Mathf.Sign(verticalInput);
@@ -95,4 +113,13 @@ public class ButtonPointer : MonoBehaviour
             ChangePointerPosition(_buttonYPositions[_selectedButtonIndex]);
         }
     }
+
+    private IEnumerator InputTimer()
+    {
+        yield return _waitForSeconds;
+        _arrowInputHandled = true;
+    }
+
+    private void OnMove(InputValue movementValue) => _movementInput = movementValue.Get<Vector2>();
+
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class OptionsMenu : MonoBehaviour
@@ -15,17 +16,30 @@ public class OptionsMenu : MonoBehaviour
     [SerializeField] Image _sfxButtonImage;
     [SerializeField] AudioSpritesSO _audioSprites;
 
+    PlayerInputActions _playerInput;
     CanvasGroup _background;
     bool _isMusicMuted;
     bool _isSfxMuted;
 
     private void Awake()
     {
+        _playerInput = new();
         _background = GetComponentInChildren<CanvasGroup>();
+    }
+
+    private void Start()
+    {
+        _playerInput.Player.Options.performed += CloseOptions;
+    }
+
+    private void OnDestroy()
+    {
+        _playerInput.Player.Options.performed -= CloseOptions;
     }
 
     private void OnEnable()
     {
+        _playerInput.Enable();
         _musicSlider.value = AudioManager.Instance.MusicVolume;
         _sfxSlider.value = AudioManager.Instance.SfxVolume;
 
@@ -36,12 +50,14 @@ public class OptionsMenu : MonoBehaviour
         _optionsTransform.LeanMoveLocalY(0, 0.5f).setEaseOutExpo().delay = 0.1f;
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        if (Input.GetKeyDown(KeyCode.Escape)) CloseOptions();
+        _playerInput.Disable();
     }
 
-    public void CloseOptions()
+    public void CloseOptions() => CloseOptions(new InputAction.CallbackContext());
+
+    public void CloseOptions(InputAction.CallbackContext context)
     {
         _background.LeanAlpha(0, 0.5f);
         _optionsTransform.LeanMoveLocalY(-Screen.height, 0.5f).setEaseInExpo().setOnComplete(OnAnimationComplete);

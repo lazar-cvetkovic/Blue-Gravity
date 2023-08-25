@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -63,6 +64,7 @@ public class DialogueUI : MonoBehaviour
 
         _dialogueLength = dialogueData.DialogueSequence.Length;
         _dialogueData = dialogueData;
+        _dialogueText.text = "";
         _isDialogueActive = true;
         _isShop = isShop;
 
@@ -91,23 +93,41 @@ public class DialogueUI : MonoBehaviour
         _textCanvasGroup.LeanAlpha(0, 0.5f);
         _imageCanvasGroup.LeanAlpha(0, 0.5f).setOnComplete(() =>
         {
-            _dialogueText.text = dialogueData.DialogueSequence[_dialogueIndex];
-
-            var dialogueSprite = dialogueData.CharacterSprites[_dialogueIndex % 2];
-            _dialogueImage.sprite = dialogueSprite;
-
+            StartCoroutine(HandleDialogueData(dialogueData));
             Fade(1, 0);
-
-            _dialogueIndex++;
-            _canClick = true;
         });
+    }
+
+    private IEnumerator HandleDialogueData(DialogueSO dialogueData)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        _dialogueText.text = dialogueData.DialogueSequence[_dialogueIndex];
+
+        var isNpc = _dialogueIndex % 2 == 0;
+        var index = GameManager.Instance.SelectedSprite;
+
+        var dialogueSprite = isNpc ? dialogueData.CharacterSprites[0] : PlayerSprites.Instance.Sprites[index];
+        _dialogueImage.sprite = dialogueSprite;
+
+        _dialogueIndex++;
+        _canClick = true;
     }
 
     private void DeactivateDialogue()
     {
         _isDialogueActive = false;
         _dialogueIndex = 0;
+
         HandleDialogueAnimation(false);
+
+        if (_isShop) StartCoroutine(StartShopping());
+    }
+
+    private IEnumerator StartShopping()
+    {
+        yield return new WaitForSeconds(1);
+        ShopManager.Instance.SetupShop();
     }
 
     private void HandleDialogueAnimation(bool isActivating)
@@ -127,7 +147,7 @@ public class DialogueUI : MonoBehaviour
             .setEase(tweenType)
             .setOnComplete(() => _canClick = true);
 
-        Fade(fadeValue, 0.7f);
+        Fade(fadeValue, 0.2f);
     }
 
     private void Fade(float fadeValue, float fadeDelay)

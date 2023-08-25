@@ -15,8 +15,8 @@ MonoBehaviour:
   DialogueSequence:
   - Greetings, traveler!
   - Good afternoon.
-  - Are you here to buy some fine clothes or perhaps looking to sell some wood and
-    rocks today?
+  - Are you here to buy some fine clothes or perhaps looking to sell some jewels
+    today?
   CharacterSprites:
   - {fileID: -6367560908665664636, guid: d348dff3819df794186a80cb95777629, type: 3}
   - {fileID: 1491662882, guid: ec0e4043c58cc034aaead66c2dcfefcd, type: 3}

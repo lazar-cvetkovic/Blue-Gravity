@@ -22,12 +22,14 @@ public class InteractUI : MonoBehaviour
     {
         _rectTransform.localScale = Vector3.zero;
         DialogueTrigger.OnInteract += HandleInteractUI;
+        DialogueTrigger.OnCloseInteraction += CloseInteraction;
         _playerInput.Player.Interact.performed += HandleButtonPressing;
     }
 
     private void OnDestroy()
     {
         DialogueTrigger.OnInteract -= HandleInteractUI;
+        DialogueTrigger.OnCloseInteraction -= CloseInteraction;
         _playerInput.Player.Interact.performed -= HandleButtonPressing;
     }
 
@@ -57,6 +59,8 @@ public class InteractUI : MonoBehaviour
             Animate(false);
         }
     }
+
+    private void CloseInteraction() => Animate(false);
 
     private void Animate(bool isOpening)
     {
