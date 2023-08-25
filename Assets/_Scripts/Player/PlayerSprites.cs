@@ -1,13 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
 
 public class PlayerSprites : Singleton<PlayerSprites>
 {
     public Sprite[] Sprites;
-    [SerializeField] AnimatorController[] _animatorControllers;
+    [SerializeField] RuntimeAnimatorController[] _animatorControllers;
 
     SpriteRenderer _currentPlayerSprite;
     Animator _animator;

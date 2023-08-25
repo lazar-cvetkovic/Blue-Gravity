@@ -10,6 +10,7 @@ public class InteractUI : MonoBehaviour
     DialogueTrigger _dialogueScript;
     RectTransform _rectTransform;
     bool _canPress = false;
+    bool _isDialogue = false;
 
     private void Awake()
     {
@@ -23,6 +24,9 @@ public class InteractUI : MonoBehaviour
         _rectTransform.localScale = Vector3.zero;
         DialogueTrigger.OnInteract += HandleInteractUI;
         DialogueTrigger.OnCloseInteraction += CloseInteraction;
+        EnterGameScene.OnInteractionStart += HandleInteractUI;
+        EnterGameScene.OnInteractionEnd += CloseInteraction;
+
         _playerInput.Player.Interact.performed += HandleButtonPressing;
     }
 
@@ -30,6 +34,8 @@ public class InteractUI : MonoBehaviour
     {
         DialogueTrigger.OnInteract -= HandleInteractUI;
         DialogueTrigger.OnCloseInteraction -= CloseInteraction;
+        EnterGameScene.OnInteractionStart -= HandleInteractUI;
+        EnterGameScene.OnInteractionEnd -= CloseInteraction;
         _playerInput.Player.Interact.performed -= HandleButtonPressing;
     }
 
@@ -45,14 +51,17 @@ public class InteractUI : MonoBehaviour
 
     private void HandleInteractUI(DialogueTrigger dialogueScript)
     {
+        _isDialogue = dialogueScript == null ? false : true;
         _dialogueScript = dialogueScript;
         _canPress = true;
         Animate(true);
     }
 
+    private void HandleInteractUI() => HandleInteractUI(null);
+
     private void HandleButtonPressing(InputAction.CallbackContext context)
     {
-        if (_canPress)
+        if (_canPress && _isDialogue)
         {
             _canPress = false;
             _dialogueScript.StartDialogue();

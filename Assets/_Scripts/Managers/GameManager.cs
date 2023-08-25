@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Animations;
-using UnityEngine;
 
 public class GameManager : SingletonPersistent<GameManager>
 {
@@ -62,6 +59,12 @@ public class GameManager : SingletonPersistent<GameManager>
         OnCoinsChanged?.Invoke();
 
         return true;
+    }
+
+    public void AddCurrencies(Currency currency)
+    {
+        Currencies[currency]++;
+        OnCoinsChanged?.Invoke();
     }
 
     public void Test()
