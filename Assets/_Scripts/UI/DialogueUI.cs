@@ -93,25 +93,19 @@ public class DialogueUI : MonoBehaviour
         _textCanvasGroup.LeanAlpha(0, 0.5f);
         _imageCanvasGroup.LeanAlpha(0, 0.5f).setOnComplete(() =>
         {
-            StartCoroutine(HandleDialogueData(dialogueData));
+            _dialogueText.text = dialogueData.DialogueSequence[_dialogueIndex];
+
+            var isNpc = _dialogueIndex % 2 == 0;
+            var index = GameManager.Instance.SelectedSprite;
+
+            var dialogueSprite = isNpc ? dialogueData.CharacterSprites[0] : PlayerSprites.Instance.Sprites[index];
+            _dialogueImage.sprite = dialogueSprite;
+
+            _dialogueIndex++;
+            _canClick = true;
+
             Fade(1, 0);
         });
-    }
-
-    private IEnumerator HandleDialogueData(DialogueSO dialogueData)
-    {
-        yield return new WaitForSeconds(0.2f);
-
-        _dialogueText.text = dialogueData.DialogueSequence[_dialogueIndex];
-
-        var isNpc = _dialogueIndex % 2 == 0;
-        var index = GameManager.Instance.SelectedSprite;
-
-        var dialogueSprite = isNpc ? dialogueData.CharacterSprites[0] : PlayerSprites.Instance.Sprites[index];
-        _dialogueImage.sprite = dialogueSprite;
-
-        _dialogueIndex++;
-        _canClick = true;
     }
 
     private void DeactivateDialogue()
